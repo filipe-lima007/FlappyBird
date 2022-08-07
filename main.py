@@ -43,6 +43,30 @@ class Bird:
     def move(self):
         self.time += 1
         distance = 1.5*(self.time**2)+self.speed*self.time
+        if distance > 16:
+            distance = 16
+        elif distance < 0:
+            distance -= 2
+        self.y += distance
+        if distance < 0 or self.y < (self.height + 50):
+            if self.angle < self.MAX_ROTATION:
+                self.angle = self.MAX_ROTATION
+        elif self.angle < -90:
+            self.angle -= self.SPEED_ROTATION
+
+    def drawn(self):
+        self.image_cont += 1
+        if self.image_cont < self.ANIMATION_TIME:
+            self.image = self.IMGS[0]
+        elif self.image_cont < self.ANIMATION_TIME*2:
+            self.image = self.IMGS[1]
+        elif self.image_cont < self.ANIMATION_TIME*3:
+            self.image = self.IMGS[2]
+        elif self.image_cont < self.ANIMATION_TIME*4:
+            self.image = self.IMGS[1]
+        elif self.image_cont >= self.ANIMATION_TIME*4+1:
+            self.image = self.IMGS[0]
+            self.image_cont = 0
 
 
 class Cano():
