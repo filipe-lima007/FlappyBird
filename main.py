@@ -78,7 +78,7 @@ class Bird:
         screen.blit(image_rotationed, rectangle.topleft)
 
     def get_mask(self):
-        pygame.mask.from_surface(self.image)
+        return pygame.mask.from_surface(self.image)
 
 
 class Cano:
@@ -155,4 +155,63 @@ def draw_screen(screen, birds, canos, ground, points):
     for cano in canos:
         cano.draw(screen)
 
-    text = SCORE_SOURCE.render(f'SCORE: {points}')
+    text = SCORE_SOURCE.render(f'SCORE: {points}', 1, (255, 255, 255))
+    screen.blit(text, (SCREEN_W - 10 - text.get_width(), 10))
+    ground.draw(screen)
+    pygame.display.update()
+
+
+def main():
+    birds = [Bird(230, 350)]
+    ground = Ground(730)
+    canos = [Cano(700)]
+    screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
+    scores = 0
+    watch = pygame.time.Clock()
+
+    running = True
+    while running:
+        watch.tick(30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    for bird in birds:
+                        bird.jump()
+
+        for bird in birds:
+            bird.move()
+        ground.move()
+
+        add_cano = False
+        removed_canos = []
+        for cano in canos:
+            for i, bird in enumerate(birds):
+                if cano.colition(bird):
+                    birds.pop(i)
+                if not cano.passed and bird.x > cano.x:
+                    cano.passed = True
+                    add_cano = True
+            cano.move()
+            if cano.x + cano.TOP_CANO.get_width() < 0:
+                removed_canos.append(cano)
+
+        if add_cano:
+            scores += 1
+            canos.append(Cano(600))
+        for cano in removed_canos:
+            canos.remove(cano)
+
+        for i, bird in enumerate(birds):
+            if (bird.y + bird.image.get_height()) > ground.y or bird.y < 0:
+                birds.pop(i)
+
+        draw_screen(screen, birds, canos, ground, scores)
+
+
+if __name__ == '__main__':
+    main()
