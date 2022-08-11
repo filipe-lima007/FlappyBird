@@ -1,6 +1,10 @@
 import pygame
 import os
 import random
+import neat
+
+ai_playing = True
+generation = 0
 
 SCREEN_W = 500
 SCREEN_H = 800
@@ -139,9 +143,9 @@ class Ground:
         self.x1 -= self.SPEED
 
         if self.x0 + self.WIDTH < 0:
-            self.x0 = self.x0 + self.WIDTH
+            self.x0 = self.x1 + self.WIDTH
         if self.x1 + self.WIDTH < 0:
-            self.x1 = self.x1 + self.WIDTH
+            self.x1 = self.x0 + self.WIDTH
 
     def draw(self, screen):
         screen.blit(self.IMAGE, (self.x0, self.y))
@@ -157,6 +161,11 @@ def draw_screen(screen, birds, canos, ground, points):
 
     text = SCORE_SOURCE.render(f'SCORE: {points}', 1, (255, 255, 255))
     screen.blit(text, (SCREEN_W - 10 - text.get_width(), 10))
+
+    if ai_playing:
+        text = SCORE_SOURCE.render(f'GENERATION: {generation}', 1, (255, 255, 255))
+        screen.blit(text, (10, 10))
+        
     ground.draw(screen)
     pygame.display.update()
 
