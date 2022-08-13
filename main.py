@@ -6,7 +6,7 @@ import neat
 ai_playing = True
 generation = 0
 
-SCREEN_W = 500
+SCREEN_W = 550
 SCREEN_H = 800
 
 C_IMAGE = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'pipe.png')))
@@ -159,7 +159,7 @@ def draw_screen(screen, birds, canos, ground, points):
     for cano in canos:
         cano.draw(screen)
 
-    text = SCORE_SOURCE.render(f'SCORE: {points}', 1, (255, 255, 255))
+    text = SCORE_SOURCE.render(f'-  SCORE: {points}', 1, (255, 255, 255))
     screen.blit(text, (SCREEN_W - 10 - text.get_width(), 10))
 
     if ai_playing:
@@ -170,8 +170,22 @@ def draw_screen(screen, birds, canos, ground, points):
     pygame.display.update()
 
 
-def main():
-    birds = [Bird(230, 350)]
+def main(gens, config):
+    global generation
+    generation += 1
+
+    if ai_playing:
+        networks = []
+        gen_list = []
+        birds = []
+        for _, gen in gens:
+            network = neat.nn.FeedForwardNetwork.create(gen, config)
+            networks.append(network)
+            gen.fitness = 0
+            gen_list.append(gen)
+            birds.append(Bird(230, 350))
+    else:
+        birds = [Bird(230, 350)]
     ground = Ground(730)
     canos = [Cano(700)]
     screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
@@ -187,13 +201,29 @@ def main():
                 running = False
                 pygame.quit()
                 quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    for bird in birds:
-                        bird.jump()
+            if not ai_playing:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        for bird in birds:
+                            bird.jump()
 
-        for bird in birds:
+        cano_index = 0
+        if len(birds) > 0:
+            if len(canos) > 1 and birds[0].x > (canos[0].x + canos[0].TOP_CANO.get_width()):
+                cano_index = 1
+        else:
+            running = False
+            break
+
+        for i, bird in enumerate(birds):
             bird.move()
+            if ai_playing:
+                gen_list[i].fitness += 0.1
+                output = networks[i].activate((bird.y,
+                                               abs(bird.y - canos[cano_index].height),
+                                               abs(bird.y - canos[cano_index].base_pos)))
+                if output[0] > 0.5:
+                    bird.jump()
         ground.move()
 
         add_cano = False
@@ -202,6 +232,10 @@ def main():
             for i, bird in enumerate(birds):
                 if cano.colition(bird):
                     birds.pop(i)
+                    if ai_playing:
+                        gen_list[i].fitness -= 1
+                        gen_list.pop(i)
+                        networks.pop(i)
                 if not cano.passed and bird.x > cano.x:
                     cano.passed = True
                     add_cano = True
@@ -212,15 +246,39 @@ def main():
         if add_cano:
             scores += 1
             canos.append(Cano(600))
+            if ai_playing:
+                for gen in gen_list:
+                    gen.fitness += 5
         for cano in removed_canos:
             canos.remove(cano)
 
         for i, bird in enumerate(birds):
             if (bird.y + bird.image.get_height()) > ground.y or bird.y < 0:
                 birds.pop(i)
+                if ai_playing:
+                    gen_list.pop(i)
+                    networks.pop(i)
 
         draw_screen(screen, birds, canos, ground, scores)
 
 
+def running(config_route):
+    config = neat.config.Config(neat.DefaultGenome,
+                                neat.DefaultReproduction,
+                                neat.DefaultSpeciesSet,
+                                neat.DefaultStagnation,
+                                config_route)
+    population = neat.Population(config)
+    population.add_reporter(neat.StdOutReporter(True))
+    population.add_reporter(neat.StatisticsReporter())
+
+    if ai_playing:
+        population.run(main, 50)
+    else:
+        main(None, None)
+
+
 if __name__ == '__main__':
-    main()
+    route = os.path.dirname(__file__)
+    config_route = os.path.join(route, 'config.txt')
+    running(config_route)
