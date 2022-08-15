@@ -2,8 +2,14 @@ import pygame
 import os
 import random
 import neat
+from time import sleep
+player = int(input('Who will play? [1] - AI or [2] - Human: '))
 
-ai_playing = True
+if player == 1:
+    ai_playing = True
+else:
+    ai_playing = False
+
 generation = 0
 
 SCREEN_W = 550
@@ -19,7 +25,7 @@ B_IMAGES = [
 ]
 
 pygame.font.init()
-SCORE_SOURCE = pygame.font.SysFont('arial', 50)
+SCORE_SOURCE = pygame.font.SysFont('arial', 30, True)
 
 
 class Bird:
@@ -159,11 +165,11 @@ def draw_screen(screen, birds, canos, ground, points):
     for cano in canos:
         cano.draw(screen)
 
-    text = SCORE_SOURCE.render(f'-  SCORE: {points}', 1, (255, 255, 255))
+    text = SCORE_SOURCE.render(f'SCORE: {points}', 1, (0, 0, 255))
     screen.blit(text, (SCREEN_W - 10 - text.get_width(), 10))
 
     if ai_playing:
-        text = SCORE_SOURCE.render(f'GENERATION: {generation}', 1, (255, 255, 255))
+        text = SCORE_SOURCE.render(f'GENERATION: {generation}', 1, (255, 0, 0))
         screen.blit(text, (10, 10))
         
     ground.draw(screen)
