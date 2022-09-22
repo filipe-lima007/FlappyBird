@@ -3,12 +3,13 @@ import os
 import random
 import neat
 from time import sleep
-player = int(input('Who will play? [1] - AI or [2] - Human: '))
+# player = int(input('Who will play? [1] - AI or [2] - Human: '))
 
-if player == 1:
-    ai_playing = True
-else:
-    ai_playing = False
+# if player == 1:
+#     ai_playing = True
+# else:
+#    ai_playing = False
+ai_playing = False
 
 generation = 0
 
@@ -238,6 +239,8 @@ def main(gens, config):
             for i, bird in enumerate(birds):
                 if cano.colition(bird):
                     birds.pop(i)
+                    if not ai_playing:
+                        game_over('Game over', screen)
                     if ai_playing:
                         gen_list[i].fitness -= 1
                         gen_list.pop(i)
@@ -261,11 +264,17 @@ def main(gens, config):
         for i, bird in enumerate(birds):
             if (bird.y + bird.image.get_height()) > ground.y or bird.y < 0:
                 birds.pop(i)
+                if not ai_playing:
+                    game_over('Game over', screen)
                 if ai_playing:
                     gen_list.pop(i)
                     networks.pop(i)
 
         draw_screen(screen, birds, canos, ground, scores)
+
+
+def into():
+    pass
 
 
 def running(config_route):
@@ -282,6 +291,30 @@ def running(config_route):
         population.run(main, 50)
     else:
         main(None, None)
+
+
+def game_over(text, screen):
+    message_display(text, screen)
+
+
+def message_display(text, screen):
+    large_text = pygame.font.Font('freesansbold.ttf', 100)
+    text_surf, text_rect = text_objects(text, large_text)
+    text_rect.center = ((SCREEN_W/2), (SCREEN_H/2))
+    screen.blit(text_surf, text_rect)
+
+    pygame.display.update()
+    sleep(2)
+    pygame.quit()
+    quit()
+
+
+def text_objects(text, font):
+    black = (0, 0, 0)
+    white = (255, 255, 255)
+    red = (255, 0, 0)
+    text_surface = font.render(text, True, black)
+    return text_surface, text_surface.get_rect()
 
 
 if __name__ == '__main__':
