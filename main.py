@@ -19,8 +19,10 @@ SCREEN_H = 800
 # Colors
 black = (0, 0, 0)
 white = (255, 255, 255)
-red = (255, 0, 0)
+red = (200, 0, 0)
+bright_red = (255, 0, 0)
 green = (0, 200, 0)
+bright_green = (0, 255, 0)
 
 C_IMAGE = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'pipe.png')))
 G_IMAGE = pygame.transform.scale2x(pygame.image.load(os.path.join('imgs', 'base.png')))
@@ -288,7 +290,7 @@ def into(screen):
 
     while intro:
         for event in pygame.event.get():
-            print(event)
+            # print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -299,13 +301,25 @@ def into(screen):
         text_rect.center = ((SCREEN_W / 2), (SCREEN_H / 2))
         screen.blit(text_surf, text_rect)
 
-        pygame.draw.rect(screen, green, (SCREEN_W/9, SCREEN_H/10, SCREEN_W/3, SCREEN_H/10))
-        pygame.draw.rect(screen, green, (5*(SCREEN_W/9), SCREEN_H/10, SCREEN_W/3, SCREEN_H/10))
-        pygame.draw.rect(screen, red, ((1/3)*SCREEN_W, SCREEN_H/4, SCREEN_W/3, SCREEN_H/10))
+        mouse = pygame.mouse.get_pos()
+
+        if ((4/9)*SCREEN_W) > mouse[0] > SCREEN_W/9 and (SCREEN_H/5) > mouse[1] > SCREEN_H/10:
+            pygame.draw.rect(screen, bright_green, (SCREEN_W / 9, SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
+        else:
+            pygame.draw.rect(screen, green, (SCREEN_W / 9, SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
+
+        if ((8/9)*SCREEN_W) > mouse[0] > (5*(SCREEN_W/9)) and (SCREEN_H/5) > mouse[1] > SCREEN_H/10:
+            pygame.draw.rect(screen, bright_green, (5 * (SCREEN_W / 9), SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
+        else:
+            pygame.draw.rect(screen, green, (5 * (SCREEN_W / 9), SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
+
+        if ((2/3)*SCREEN_W) > mouse[0] > (1/3)*SCREEN_W and ((7/20)*SCREEN_H) > mouse[1] > SCREEN_H/10:
+            pygame.draw.rect(screen, bright_red, ((1 / 3) * SCREEN_W, SCREEN_H / 4, SCREEN_W / 3, SCREEN_H / 10))
+        else:
+            pygame.draw.rect(screen, red, ((1 / 3) * SCREEN_W, SCREEN_H / 4, SCREEN_W / 3, SCREEN_H / 10))
 
         pygame.display.update()
         clock.tick(15)
-
 
 
 def running(config_route):
