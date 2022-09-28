@@ -283,6 +283,20 @@ def main(gens, config):
         draw_screen(screen, birds, canos, ground, scores)
 
 
+def button(screen, msg, x, y, width, height, inactive_color, active_color):
+    mouse = pygame.mouse.get_pos()
+
+    if (x + width) > mouse[0] > x and (y + height) > mouse[1] > y:
+        pygame.draw.rect(screen, active_color, (x, y, width, height))
+    else:
+        pygame.draw.rect(screen, inactive_color, (x, y, width, height))
+
+    small_text = pygame.font.Font('freesansbold.ttf', 20)
+    text_surf, text_rect = text_objects(msg, small_text)
+    text_rect.center = ((x + (width/2)), (y + (height/2)))
+    screen.blit(text_surf, text_rect)
+
+
 def into(screen):
     text = 'Flappy bird'
     clock = pygame.time.Clock()
@@ -301,22 +315,12 @@ def into(screen):
         text_rect.center = ((SCREEN_W / 2), (SCREEN_H / 2))
         screen.blit(text_surf, text_rect)
 
-        mouse = pygame.mouse.get_pos()
+        button(screen, 'Human', (SCREEN_W/9), (SCREEN_H/10), (SCREEN_W/3), (SCREEN_H/10), green, bright_green)
 
-        if ((4/9)*SCREEN_W) > mouse[0] > SCREEN_W/9 and (SCREEN_H/5) > mouse[1] > SCREEN_H/10:
-            pygame.draw.rect(screen, bright_green, (SCREEN_W / 9, SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
-        else:
-            pygame.draw.rect(screen, green, (SCREEN_W / 9, SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
+        button(screen, 'AI', (5*(SCREEN_W/9)), (SCREEN_H / 10), (SCREEN_W / 3), (SCREEN_H / 10), green, bright_green)
 
-        if ((8/9)*SCREEN_W) > mouse[0] > (5*(SCREEN_W/9)) and (SCREEN_H/5) > mouse[1] > SCREEN_H/10:
-            pygame.draw.rect(screen, bright_green, (5 * (SCREEN_W / 9), SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
-        else:
-            pygame.draw.rect(screen, green, (5 * (SCREEN_W / 9), SCREEN_H / 10, SCREEN_W / 3, SCREEN_H / 10))
-
-        if ((2/3)*SCREEN_W) > mouse[0] > (1/3)*SCREEN_W and ((7/20)*SCREEN_H) > mouse[1] > SCREEN_H/10:
-            pygame.draw.rect(screen, bright_red, ((1 / 3) * SCREEN_W, SCREEN_H / 4, SCREEN_W / 3, SCREEN_H / 10))
-        else:
-            pygame.draw.rect(screen, red, ((1 / 3) * SCREEN_W, SCREEN_H / 4, SCREEN_W / 3, SCREEN_H / 10))
+        button(screen, 'Exit', ((1/3)*SCREEN_W), (SCREEN_H / 4), (SCREEN_W / 3), (SCREEN_H / 10), red,
+               bright_red)
 
         pygame.display.update()
         clock.tick(15)
