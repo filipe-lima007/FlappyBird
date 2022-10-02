@@ -3,12 +3,7 @@ import os
 import random
 import neat
 from time import sleep
-# player = int(input('Who will play? [1] - AI or [2] - Human: '))
 
-# if player == 1:
-#     ai_playing = True
-# else:
-#    ai_playing = False
 ai_playing = False
 
 generation = 0
@@ -278,16 +273,18 @@ def main(gens, config):
                 if ai_playing:
                     gen_list.pop(i)
                     networks.pop(i)
-
-        into(screen)
         draw_screen(screen, birds, canos, ground, scores)
 
 
-def button(screen, msg, x, y, width, height, inactive_color, active_color):
+def button(screen, msg, x, y, width, height, inactive_color, active_color, action=None):
     mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
 
     if (x + width) > mouse[0] > x and (y + height) > mouse[1] > y:
         pygame.draw.rect(screen, active_color, (x, y, width, height))
+
+        if click[0] and action:
+            action()
     else:
         pygame.draw.rect(screen, inactive_color, (x, y, width, height))
 
@@ -304,7 +301,6 @@ def into(screen):
 
     while intro:
         for event in pygame.event.get():
-            # print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -315,18 +311,26 @@ def into(screen):
         text_rect.center = ((SCREEN_W / 2), (SCREEN_H / 2))
         screen.blit(text_surf, text_rect)
 
-        button(screen, 'Human', (SCREEN_W/9), (SCREEN_H/10), (SCREEN_W/3), (SCREEN_H/10), green, bright_green)
+        button(screen, 'Human', (SCREEN_W/9), (SCREEN_H/10), (SCREEN_W/3), (SCREEN_H/10), green,
+               bright_green, start_game)
 
-        button(screen, 'AI', (5*(SCREEN_W/9)), (SCREEN_H / 10), (SCREEN_W / 3), (SCREEN_H / 10), green, bright_green)
+        button(screen, 'AI', (5*(SCREEN_W/9)), (SCREEN_H / 10), (SCREEN_W / 3), (SCREEN_H / 10), green,
+               bright_green, start_game_ai)
 
         button(screen, 'Exit', ((1/3)*SCREEN_W), (SCREEN_H / 4), (SCREEN_W / 3), (SCREEN_H / 10), red,
-               bright_red)
+               bright_red, quit_game)
 
         pygame.display.update()
         clock.tick(15)
 
 
+def quit_game():
+    pygame.quit()
+    quit()
+
+
 def running(config_route):
+    screen = pygame.display.set_mode((SCREEN_W, SCREEN_H))
     config = neat.config.Config(neat.DefaultGenome,
                                 neat.DefaultReproduction,
                                 neat.DefaultSpeciesSet,
@@ -339,7 +343,7 @@ def running(config_route):
     if ai_playing:
         population.run(main, 50)
     else:
-        main(None, None)
+        into(screen)
 
 
 def game_over(text, screen):
@@ -354,13 +358,32 @@ def message_display(text, screen):
 
     pygame.display.update()
     sleep(2)
-    pygame.quit()
-    quit()
+    into(screen)
 
 
 def text_objects(text, font):
     text_surface = font.render(text, True, black)
     return text_surface, text_surface.get_rect()
+
+
+def start_game():
+    main(None, None)
+
+
+def start_game_ai():
+    global ai_playing
+    ai_playing = True
+    config = neat.config.Config(neat.DefaultGenome,
+                                neat.DefaultReproduction,
+                                neat.DefaultSpeciesSet,
+                                neat.DefaultStagnation,
+                                config_route)
+    population = neat.Population(config)
+    population.add_reporter(neat.StdOutReporter(True))
+    population.add_reporter(neat.StatisticsReporter())
+
+    if ai_playing:
+        population.run(main, 50)
 
 
 if __name__ == '__main__':
