@@ -31,6 +31,8 @@ B_IMAGES = [
 pygame.font.init()
 SCORE_SOURCE = pygame.font.SysFont('arial', 30, True)
 pygame.display.set_caption('Flappy bird')
+icon_image = pygame.image.load('bird1.png')
+pygame.display.set_icon(icon_image)
 
 
 class Bird:
