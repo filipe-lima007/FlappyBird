@@ -2,7 +2,7 @@
 # This is my own version of the FlappyBird game.
 # To play follow these steps:
 # Step 1: 
-Download the build.zip file.
+To get the Windows version of the game, download the build folder. Go to build\exe.win-amd64-3.10.
 # Step 2: 
 Unzip and go into the build folder.
 # Step 3: 
