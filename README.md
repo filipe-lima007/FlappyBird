@@ -4,9 +4,9 @@
 # Step 1: 
 To get the Windows version of the game, download the build folder. Go to build\exe.win-amd64-3.10.
 # Step 2: 
-Unzip and go into the build folder.
+Double-click on the FlappyBird.exe application
 # Step 3: 
-Go into the exe.win-amd64-3.10 folder.
+Choose who will play: human or AI.
 # Step 4: 
 Double-click the file FlappyBird.exe.
 # Step 5: 
